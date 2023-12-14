@@ -71,6 +71,31 @@ function attachCmd() {
     $('#renderManageUsersMenuCmd').on('click', renderManageUsers);
     $('#editProfilCmd').on('click', renderEditProfilForm);
     $('#aboutCmd').on("click", renderAbout);
+    // sort photo buttons
+    $('#setSearchKeywordsCmd').on("click", function() {
+        keywords = $('#keywords');
+        renderPhotos();
+    });
+    $('#sortByDateCmd').on("click", function() {
+        sortType = "date";
+        renderPhotos();
+    });
+    $('#sortByOwnersCmd').on("click", function() {
+        sortType = "owners";
+        renderPhotos();
+    });
+    $('#sortByLikesCmd').on("click", function() {
+        sortType = "likes";
+        renderPhotos();
+    });
+    $('#sortByKeywordsCmd').on("click", function() {
+        sortType = "keywords";
+        renderPhotos();
+    })
+    $('#ownerOnlyCmd').on("click", function() {
+        sortType = "own";
+        renderPhotos();
+    });
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Header management
@@ -105,8 +130,155 @@ function loggedUserMenu() {
 }
 function viewMenu(viewName) {
     if (viewName == "photosList") {
-        // todo
-        return "";
+        let sortOptions;
+
+        if(sortType == "date") {
+            sortOptions = `
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="sortByDateCmd">
+                    <i class="menuIcon fa fa-check mx-2"></i>
+                    <i class="menuIcon fa fa-calendar mx-2"></i>
+                    Photos par date de création
+                </span>
+                <span class="dropdown-item" id="sortByOwnersCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-users mx-2"></i>
+                    Photos par créateur
+                </span>
+                <span class="dropdown-item" id="sortByLikesCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Photos les plus aiméés
+                </span>
+                <span class="dropdown-item" id="sortByKeywordsCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-search mx-2"></i>
+                    Photos par mots clés
+                </span>
+                <span class="dropdown-item" id="ownerOnlyCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Mes photos
+                </span>
+            `;
+        } else if (sortType = "owners") {
+            sortOptions = `
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="sortByDateCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-calendar mx-2"></i>
+                    Photos par date de création
+                </span>
+                <span class="dropdown-item" id="sortByOwnersCmd">
+                    <i class="menuIcon fa fa-check mx-2"></i>
+                    <i class="menuIcon fa fa-users mx-2"></i>
+                    Photos par créateur
+                </span>
+                <span class="dropdown-item" id="sortByLikesCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Photos les plus aiméés
+                </span>
+                <span class="dropdown-item" id="sortByKeywordsCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-search mx-2"></i>
+                    Photos par mots clés
+                </span>
+                <span class="dropdown-item" id="ownerOnlyCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Mes photos
+                </span>
+            `;
+        } else if (sortType == "likes") {
+            sortOptions = `
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="sortByDateCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-calendar mx-2"></i>
+                    Photos par date de création
+                </span>
+                <span class="dropdown-item" id="sortByOwnersCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-users mx-2"></i>
+                    Photos par créateur
+                </span>
+                <span class="dropdown-item" id="sortByLikesCmd">
+                    <i class="menuIcon fa fa-check mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Photos les plus aiméés
+                </span>
+                <span class="dropdown-item" id="sortByKeywordsCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-search mx-2"></i>
+                    Photos par mots clés
+                </span>
+                <span class="dropdown-item" id="ownerOnlyCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Mes photos
+                </span>
+            `;
+        } else if (sortType == "keywords") {
+            sortOptions = `
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="sortByDateCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-calendar mx-2"></i>
+                    Photos par date de création
+                </span>
+                <span class="dropdown-item" id="sortByOwnersCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-users mx-2"></i>
+                    Photos par créateur
+                </span>
+                <span class="dropdown-item" id="sortByLikesCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Photos les plus aiméés
+                </span>
+                <span class="dropdown-item" id="sortByKeywordsCmd">
+                    <i class="menuIcon fa fa-check mx-2"></i>
+                    <i class="menuIcon fa fa-search mx-2"></i>
+                    Photos par mots clés
+                </span>
+                <span class="dropdown-item" id="ownerOnlyCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Mes photos
+                </span>
+            `;
+        } else /*if (sortType == "own")*/ {
+            sortOptions = `
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="sortByDateCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-calendar mx-2"></i>
+                    Photos par date de création
+                </span>
+                <span class="dropdown-item" id="sortByOwnersCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-users mx-2"></i>
+                    Photos par créateur
+                </span>
+                <span class="dropdown-item" id="sortByLikesCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Photos les plus aiméés
+                </span>
+                <span class="dropdown-item" id="sortByKeywordsCmd">
+                    <i class="menuIcon fa fa-fw mx-2"></i>
+                    <i class="menuIcon fa fa-search mx-2"></i>
+                    Photos par mots clés
+                </span>
+                <span class="dropdown-item" id="ownerOnlyCmd">
+                    <i class="menuIcon fa fa-check mx-2"></i>
+                    <i class="menuIcon fa fa-user mx-2"></i>
+                    Mes photos
+                </span>
+            `;
+        }
+        return sortOptions;
     }
     else
         return "";
