@@ -178,6 +178,8 @@ export default class AccountsController extends Controller {
                     if (user.Email != foundedUser.Email) {
                         user.VerifyCode = utilities.makeVerifyCode(6);
                         this.sendVerificationEmail(user);
+                    } else {
+                        user.VerifyCode = foundedUser.VerifyCode;
                     }
                     let updatedUser = this.repository.update(user.Id, user);
                     if (this.repository.model.state.isValid) {
