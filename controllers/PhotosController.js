@@ -10,4 +10,17 @@ export default
         super(HttpContext, new Repository(new PhotoModel()), Authorizations.user());
        // this.photoLikesRepository = new Repository(new PhotoLikeModel());
     }
+    //GET : /accounts/conflict?Id=...&Email=.....
+    conflict() {
+        if (this.repository != null) {
+            let id = this.HttpContext.path.params.Id;
+            let email = this.HttpContext.path.params.Email;
+            if (id && email) {
+                let prototype = { Id: id, Email: email };
+                this.HttpContext.response.updated(this.repository.checkConflict(prototype));
+            } else
+                this.HttpContext.response.updated(false);
+        } else
+            this.HttpContext.response.updated(false);
+    }
 }

@@ -516,6 +516,8 @@ async function renderPhotos() {
     showWaitingGif();
     UpdateHeader('Liste des photos', 'photosList')
     $("#newPhotoCmd").show();
+    // add photo button
+    $("#newPhotoCmd").on("click", renderNewPhotoForm);
     $("#abort").hide();
     let loggedUser = API.retrieveLoggedUser();
     if (loggedUser)
@@ -533,19 +535,17 @@ function renderVerify() {
     UpdateHeader("Vérification", "verify");
     $("#newPhotoCmd").hide();
     $("#content").append(`
-        <div class="content">
-            <form class="form" id="verifyForm">
-                <b>Veuillez entrer le code de vérification de que vous avez reçu par courriel</b>
-                <input  type='text' 
-                        name='Code'
-                        class="form-control"
-                        required
-                        RequireMessage = 'Veuillez entrer le code que vous avez reçu par courriel'
-                        InvalidMessage = 'Courriel invalide';
-                        placeholder="Code de vérification de courriel" > 
-                <input type='submit' name='submit' value="Vérifier" class="form-control btn-primary">
-            </form>
-        </div>
+        <form class="form" id="verifyForm">
+            <b>Veuillez entrer le code de vérification de que vous avez reçu par courriel</b>
+            <input  type='text' 
+                    name='Code'
+                    class="form-control"
+                    required
+                    RequireMessage = 'Veuillez entrer le code que vous avez reçu par courriel'
+                    InvalidMessage = 'Courriel invalide';
+                    placeholder="Code de vérification de courriel" > 
+            <input type='submit' name='submit' value="Vérifier" class="form-control btn-primary">
+        </form>
     `);
     initFormValidation(); // important do to after all html injection!
     $('#verifyForm').on("submit", function (event) {
@@ -882,32 +882,30 @@ function renderLoginForm() {
     UpdateHeader("Connexion", "Login");
     $("#newPhotoCmd").hide();
     $("#content").append(`
-        <div class="content" style="text-align:center">
-            <div class="loginMessage">${loginMessage}</div>
-            <form class="form" id="loginForm">
-                <input  type='email' 
-                        name='Email'
-                        class="form-control"
-                        required
-                        RequireMessage = 'Veuillez entrer votre courriel'
-                        InvalidMessage = 'Courriel invalide'
-                        placeholder="adresse de courriel"
-                        value='${Email}'> 
-                <span style='color:red'>${EmailError}</span>
-                <input  type='password' 
-                        name='Password' 
-                        placeholder='Mot de passe'
-                        class="form-control"
-                        required
-                        RequireMessage = 'Veuillez entrer votre mot de passe'
-                        InvalidMessage = 'Mot de passe trop court' >
-                <span style='color:red'>${passwordError}</span>
-                <input type='submit' name='submit' value="Entrer" class="form-control btn-primary">
-            </form>
-            <div class="form">
-                <hr>
-                <button class="form-control btn-info" id="createProfilCmd">Nouveau compte</button>
-            </div>
+        <div class="loginMessage">${loginMessage}</div>
+        <form class="form" id="loginForm">
+            <input  type='email' 
+                    name='Email'
+                    class="form-control"
+                    required
+                    RequireMessage = 'Veuillez entrer votre courriel'
+                    InvalidMessage = 'Courriel invalide'
+                    placeholder="adresse de courriel"
+                    value='${Email}'> 
+            <span style='color:red'>${EmailError}</span>
+            <input  type='password' 
+                    name='Password' 
+                    placeholder='Mot de passe'
+                    class="form-control"
+                    required
+                    RequireMessage = 'Veuillez entrer votre mot de passe'
+                    InvalidMessage = 'Mot de passe trop court' >
+            <span style='color:red'>${passwordError}</span>
+            <input type='submit' name='submit' value="Entrer" class="form-control btn-primary">
+        </form>
+        <div class="form">
+            <hr>
+            <button class="form-control btn-info" id="createProfilCmd">Nouveau compte</button>
         </div>
     `);
     initFormValidation(); // important do to after all html injection!
@@ -917,6 +915,144 @@ function renderLoginForm() {
         event.preventDefault();
         showWaitingGif();
         login(credential);
+    });
+}
+function renderPhotoDetail() {
+    
+}
+function renderNewPhotoForm() {
+    noTimeout();
+    eraseContent();
+    UpdateHeader("Ajout de photos", "addPhoto");
+    $("#newPhotoCmd").hide();
+    let userId = API.retrieveLoggedUser().Id;
+    $("#content").append(`
+        <form class="form" id="createPhotoForm"'>
+            <fieldset>
+                <legend>Informations</legend>
+                <input type = 'hidden'
+                        id = 'OwnerId'
+                        name = 'OwnerId'
+                        value = "${userId}"/>
+                <input  type="text" 
+                        class="form-control" 
+                        name="Title" 
+                        id="Title"
+                        placeholder="Titre" 
+                        required 
+                        RequireMessage = 'Veuillez entrer un titre'
+                        InvalidMessage = 'Titre trop court'
+                        CustomErrorMessage ="Ce titre est déjà utilisé"/>
+                <input type = 'hidden'
+                        id = 'Date'
+                        name = 'Date'/>
+                <textarea  class="form-control" 
+                        name="Description" 
+                        id="Description" 
+                        placeholder="Description"
+                        required
+                        RequireMessage = 'Veuillez entrer une description'
+                        InvalidMessage = 'Description trop courte'/>
+                <input type = 'checkbox'
+                        id = 'Shared'
+                        name = 'Shared'/>
+                    <label for='Shared'> Partagée</label>
+            </fieldset>
+            <fieldset>
+                <legend>Image</legend>
+                <div class='imageUploader' 
+                        newImage='true' 
+                        controlId='Image' 
+                        imageSrc='images/PhotoCloudLogo.png' 
+                        waitingImage="images/Loading_icon.gif">
+                </div>
+            </fieldset>
+
+            <input type='submit' name='submit' id='saveImage' value="Enregistrer" class="form-control btn-primary">
+        </form>
+        <div class="cancel">
+            <button class="form-control btn-secondary" id="abortCreatePhotoCmd">Annuler</button>
+        </div>
+    `);
+    initFormValidation(); // important do to after all html injection!
+    initImageUploaders();
+    $('#abortCreatePhotoCmd').on('click', renderPhotos);
+    addConflictValidation(serverHost + "/photos/conflict", 'Title', 'saveImage');
+    $('#createPhotoForm').on("submit", function (event) {
+        $("#Date").val(Date.now());
+        let photo = getFormData($('#createPhotoForm'));
+        event.preventDefault();
+        showWaitingGif();
+        createPhoto(photo);
+    });
+}
+function renderModifyPhotoForm(photoId) {
+    noTimeout();
+    eraseContent();
+    UpdateHeader("Modification de photos", "modifyPhoto");
+    $("#newPhotoCmd").hide();
+    let oldPhoto = JSON.parse(API.GetPhotosById(photoId));
+    $("#content").append(`
+        <form class="form" id="modifyPhotoForm"'>
+            <fieldset>
+                <legend>Informations</legend>
+                <input type = 'hidden'
+                        id = 'OwnerId'
+                        name = 'OwnerId'
+                        value = "${oldPhoto.OwnerId}"/>
+                <input  type="text" 
+                        class="form-control" 
+                        name="Title" 
+                        id="Title"
+                        placeholder="Titre" 
+                        required 
+                        RequireMessage = 'Veuillez entrer un titre'
+                        InvalidMessage = 'Titre trop court'
+                        CustomErrorMessage ="Ce titre est déjà utilisé"
+                        value = "${oldPhoto.Title}"/>
+                <input type = 'hidden'
+                        id = 'Date'
+                        name = 'Date'
+                        value = "${oldPhoto.Date}"/>
+                <textarea  class="form-control" 
+                        name="Description" 
+                        id="Description" 
+                        placeholder="Description"
+                        required
+                        RequireMessage = 'Veuillez entrer une description'
+                        InvalidMessage = 'Description trop courte'
+                        value = "${oldPhoto.Description}"/>
+                <input type = 'checkbox'
+                        id = 'Shared'
+                        name = 'Shared'
+                        checked = "${oldPhoto.Shared}"/>
+                    <label for='Shared'> Partagée</label>
+            </fieldset>
+            <fieldset>
+                <legend>Image</legend>
+                <div class='imageUploader' 
+                        newImage='false' 
+                        controlId='Image'
+                        imageSrc='${oldPhoto.Image}' 
+                        waitingImage="images/Loading_icon.gif">
+                </div>
+            </fieldset>
+
+            <input type='submit' name='submit' id='saveImage' value="Enregistrer" class="form-control btn-primary">
+        </form>
+        <div class="cancel">
+            <button class="form-control btn-secondary" id="abortModifyPhotoCmd">Annuler</button>
+        </div>
+    `);
+    initFormValidation(); // important do to after all html injection!
+    initImageUploaders();
+    $('#abortModifyPhotoCmd').on('click', renderPhotos);
+    addConflictValidation(serverHost + "/photos/conflict", 'Title', 'saveImage');
+    $('#modifyPhotoForm').on("submit", function (event) {
+        let photo = getFormData($('#modifyPhotoForm'));
+        event.preventDefault();
+        showWaitingGif();
+        createPhoto(photo);
     });
 }
 function getFormData($form) {
