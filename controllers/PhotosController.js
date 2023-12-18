@@ -14,9 +14,9 @@ export default
     conflict() {
         if (this.repository != null) {
             let id = this.HttpContext.path.params.Id;
-            let email = this.HttpContext.path.params.Email;
-            if (id && email) {
-                let prototype = { Id: id, Email: email };
+            let title = this.HttpContext.path.params.Title;
+            if (id && title) {
+                let prototype = { Id: id, Title: title };
                 this.HttpContext.response.updated(this.repository.checkConflict(prototype));
             } else
                 this.HttpContext.response.updated(false);

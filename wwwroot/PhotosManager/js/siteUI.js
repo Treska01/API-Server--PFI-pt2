@@ -407,7 +407,11 @@ async function createProfil(profil) {
     }
 }
 async function adminDeleteAccount(userId) {
+    let account = JSON.parse(API.GetAccount(userId));
+    let username = account.Name;
+
     if (await API.unsubscribeAccount(userId)) {
+        API.RemoveAllUsersLikes(username);
         renderManageUsers();
     } else {
         renderError("Un problème est survenu.");
@@ -417,6 +421,7 @@ async function deleteProfil() {
     let loggedUser = API.retrieveLoggedUser();
     if (loggedUser) {
         if (await API.unsubscribeAccount(loggedUser.Id)) {
+            API.RemoveAllUsersLikes(loggedUser.Name);
             loginMessage = "Votre compte a été effacé.";
             logout();
         } else
@@ -919,6 +924,9 @@ function renderLoginForm() {
 }
 function renderPhotoDetail() {
     
+}
+function renderConfirmPhotoDelete() {
+
 }
 function renderNewPhotoForm() {
     noTimeout();

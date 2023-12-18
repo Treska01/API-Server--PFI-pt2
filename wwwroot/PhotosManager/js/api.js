@@ -286,6 +286,54 @@ class API {
             });
         });
     }
+    static isLiked(photoId, username) {
+        let thisPhoto = JSON.parse(this.GetPhotosById(photoId));
+        let hasLiked = false;
+        for (let index = 0; index < thisPhoto.Likes.length; index++) {
+            if (thisPhoto.Likes[index] == username){
+                hasLiked = true;
+                break;
+            }
+        }
+
+        return hasLiked;
+    }
+    static ToggleLike(photoId, username) {
+        let thisPhoto = JSON.parse(this.GetPhotosById(photoId));
+        let hasLikedindex = -1;
+        for (let index = 0; index < thisPhoto.Likes.length; index++) {
+            if (thisPhoto.Likes[index] == username){
+                hasLikedindex = index;
+                break;
+            }
+        }
+
+        if (hasLikedindex == -1) {
+            thisPhoto.Likes.unshift(username);
+        } else {
+            thisPhoto.Likes.splice(hasLikedindex, 1);
+        }
+
+        this.UpdatePhoto(thisPhoto);
+    }
+    static RemoveAllUsersLikes(username) {
+        let photos = JSON.parse(this.GetPhotos());
+        for (let i = 0; i < photos.length; i++) {
+            let likedIndex = -1;
+
+            for (let j = 0; j < photos[i].Likes.length; j++) {
+                if(photos[i].Likes[j] == username) {
+                    likedIndex = j;
+                    break;
+                }
+            }
+
+            if (likedIndex != -1) {
+                photos[i].Likes.splice(likedindex, 1);
+                this.UpdatePhoto(photos[i]);
+            }
+        }
+    }
 }
 
 
