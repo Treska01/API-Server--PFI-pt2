@@ -518,7 +518,7 @@ function renderAbout() {
                     Collège Lionel-Groulx, automne 2023
                 </p>
             </div>
-        `))
+        `));
 }
 async function renderPhotos() {
     timeout();
@@ -537,7 +537,69 @@ async function renderPhotos() {
 }
 async function renderPhotosList() {
     eraseContent();
-    $("#content").append("<h2> En contruction </h2>");
+    $("#content").append(
+        $(`
+            <div class="photosLayout">
+                <!--insert list here-->
+            </div>
+        `)
+    );
+
+    let queryString = "";
+    switch (sortType) {
+        case "keywords":
+            queryString = "Description=*"+keywords+"*";
+            break;
+        case "own":
+            queryString = "OwnerId=" + API.retrieveLoggedUser().Id;
+            break;
+        default:
+            queryString = sortType;
+            break;
+    }
+    let photos = API.GetPhotos(queryString);
+
+    for (let index = 0; index < photos.length; index++) {
+        const photo = photos[index];
+
+        if (photo.OwnerId == API.retrieveLoggedUser().Id
+             || photo.Shared) {
+            $(".photosLayout").append(
+                $(`
+                    <div class="photoLayout" id="${photo.Id}">
+                        <div class="photoTitleContainer">
+                            <div class="photoTitle">${photo.Title}</div>
+                            <div class="cmdIconSmall fa-solid fa-pencil"></div>
+                            <div class="cmdIconSmall fa-solid fa-trash"></div>
+                        </div>
+                        <div class="photoImage" style="background-image:'${photo.Image}'">
+                            <div class="UserAvatarSmall" style="background-image:url('${API.GetAccount(photo.OwnerId).Avatar}')"></div>
+                        </div>
+                        <div class="photoCreationDate">
+                            <div>${DATE.convertToFrenchDate(photo.Date)}</div>
+                            <div class="likesSummary">
+                                <div class="dodgerblueCmd">${photo.Likes.length}</div>
+                                <div class="cmdIconSmall fa-regular fa-thumb-up"></div>
+                            </div>
+                        </div>
+                    </div>
+                `)
+            );
+
+            if (photo.OwnerId == API.retrieveLoggedUser().Id) {
+                $('#'+photo.Id+' .fa-solid').hide();
+            }
+    
+            if (photo.OwnerId == API.retrieveLoggedUser().Id
+             && photo.Shared) {
+                $('#'+photo.Id+' .photoImage').append(
+                    $(`
+                        <div class="UserAvatarSmall" style="background-image:url('../images/shared.png')"></div>
+                    `)
+                );
+            }
+        }
+    }
 }
 function renderVerify() {
     eraseContent();
