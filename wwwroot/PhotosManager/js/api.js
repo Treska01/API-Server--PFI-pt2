@@ -334,6 +334,20 @@ class API {
             }
         }
     }
+    static ChangeLikesUsername(oldUsername, newUsername) {
+        let photos = JSON.parse(this.GetPhotos());
+        for (let i = 0; i < photos.length; i++) {
+            let hasChanged = false;
+            for (let j = 0; j < photos[i].Likes.length; j++) {
+                if(photos[i].Likes[j] == oldUsername) {
+                    photos[i].Likes[j] = newUsername;
+                    hasChanged = true;
+                }
+            }
+            if(hasChanged)
+                this.UpdatePhoto(photos[i]);
+        }
+    }
 }
 
 

@@ -384,10 +384,14 @@ async function verify(verifyCode) {
     }
 }
 async function editProfil(profil) {
+    let oldUsername = API.retrieveLoggedUser().Name;
     if (await API.modifyUserProfil(profil)) {
         let loggedUser = API.retrieveLoggedUser();
         if (loggedUser) {
             if (isVerified()) {
+                if(oldUsername != loggedUser.Name) {
+                    API.ChangeLikesUsername(oldUsername, loggedUser.Name);
+                }
                 renderPhotos();
             } else
                 renderVerify();
