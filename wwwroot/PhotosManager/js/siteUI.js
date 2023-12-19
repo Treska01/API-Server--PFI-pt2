@@ -1,3 +1,5 @@
+import Authorizations from "../../../authorizations";
+
 //<span class="cmdIcon fa-solid fa-ellipsis-vertical"></span>
 let contentScrollPosition = 0;
 let sortType = "date";
@@ -561,9 +563,10 @@ async function renderPhotosList() {
 
     for (let index = 0; index < photos.length; index++) {
         const photo = photos[index];
+        loggedUser = API.retrieveLoggedUser();
 
-        if (photo.OwnerId == API.retrieveLoggedUser().Id
-             || photo.Shared) {
+        if (photo.OwnerId == loggedUser.Id
+             || photo.Shared || loggedUser.Authorizations == Authorizations.admin) {
             $(".photosLayout").append(
                 $(`
                     <div class="photoLayout" id="${photo.Id}">
@@ -586,11 +589,20 @@ async function renderPhotosList() {
                 `)
             );
 
-            if (photo.OwnerId == API.retrieveLoggedUser().Id) {
+            if (photo.OwnerId == loggedUser.Id
+                 || loggedUser.Authorizations == Authorizations.admin) {
+                $('#'+photo.Id+' .fa-pencil').on("click", function () {
+                    renderModifyPhotoForm(photo.Id);
+                });
+                $('#'+photo.Id+' .fa-trash').on("click", function () {
+                    renderConfirmDeletePhoto(photo.Id);
+                });
+            } else {
                 $('#'+photo.Id+' .fa-solid').hide();
             }
     
-            if (photo.OwnerId == API.retrieveLoggedUser().Id
+            if ((photo.OwnerId == loggedUser.Id
+                 || loggedUser.Authorizations == Authorizations.admin)
              && photo.Shared) {
                 $('#'+photo.Id+' .photoImage').append(
                     $(`
@@ -598,6 +610,10 @@ async function renderPhotosList() {
                     `)
                 );
             }
+
+            $('#'+photo.Id+' .photoImage').on("click", function() {
+                renderPhotoDetail(photo.Id);
+            });
         }
     }
 }
@@ -988,11 +1004,42 @@ function renderLoginForm() {
         login(credential);
     });
 }
-function renderPhotoDetail() {
+function renderPhotoDetail(photoId) {
     
 }
-function renderConfirmPhotoDelete() {
-
+function renderConfirmDeletePhoto(photoId) {
+    timeout();
+    let photoToDelete = API.GetPhotosById(photoId);
+    if (photoToDelete) {
+        eraseContent();
+        UpdateHeader("Retrait de photo", "confirmDeletePhoto");
+        $("#newPhotoCmd").hide();
+        $("#content").append(`
+            <div class="content deletePhotoForm">
+                <br>
+                
+                <div class="form">
+                 <h3> Voulez-vous vraiment effacer cette photo? </h3>
+                    <div class="photoLayout">
+                        <div class="photoTitleContainer">
+                        <div class="photoTitle">${photoToDelete.Title}</div>
+                    </div>
+                    <div class="photoImage" style="background-image:'${photoToDelete.Image}'">
+                    </div>
+                    </div>
+                    <button class="form-control btn-danger" id="deletePhotoCmd">Effacer la photo</button>
+                    <br>
+                    <button class="form-control btn-secondary" id="cancelDeletePhotoCmd">Annuler</button>
+                </div>
+            </div>
+        `);
+        $("#deletePhotoCmd").on("click", function() {
+            API.DeletePhoto(photoId);
+        });
+        $('#cancelDeletePhotoCmd').on('click', renderPhotos);
+    } else {
+        renderPhotos();
+    }
 }
 function renderNewPhotoForm() {
     noTimeout();
